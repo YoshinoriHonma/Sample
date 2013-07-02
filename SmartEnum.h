@@ -1,51 +1,51 @@
 #pragma once
 //! @file
-//! @brief		�X�}�[�genum��`
-//! @details	enum��`���`��::�l�Ƃ����`�ŃA�N�Z�X�ł���悤�ɂ��܂��B
-//! <br>		�E����̌^�ȊO�̑���͂ł��܂���
-//! <br>		�E�^��`���Ƀf�t�H���g�̏����l���`���邱�Ƃɂ��A�������R���h���܂�
-//! <br>		�@�t�@�C������擾�����l�ȂǁA�~�ނ𓾂����l�^�̒l��������ꍇ��Import�֐����g���Ă�������
+//! @brief		スマートenum定義
+//! @details	enum定義を定義名::値という形でアクセスできるようにします。
+//! <br>		・同一の型以外の代入はできません
+//! <br>		・型定義時にデフォルトの初期値を定義することにより、初期化漏れを防ぎます
+//! <br>		　ファイルから取得した値など、止むを得ず数値型の値を代入する場合はImport関数を使ってください
 //! @code
-//! // �^�̒�`
+//! // 型の定義
 //! SmartEnumBegin( ABC )
 //! {
 //! 	OK,
 //! 	NG
 //! } SmartEnumEnd( ABC, OK );
 //!
-//! ��`�����^�̗��p
+//! 定義した型の利用
 //! ABC a = ABC::OK;
-//! ��r���\
+//! 比較も可能
 //! if ( a == ABC::OK )
 //! {
 //!		a = ABC::NG;
 //! }
-//! // ���l����l���Z�b�g���Ȃ��Ă͂Ȃ�Ȃ��ꍇ��Import���g���Ă�������
-//! // �� ���̏ꍇ�͌^�`�F�b�N���s���܂���
-//! // �@ �K�v�ɉ����ĕʓr�l�̃`�F�b�N���s���Ă�������
+//! // 数値から値をセットしなくてはならない場合はImportを使ってください
+//! // ※ この場合は型チェックが行われません
+//! // 　 必要に応じて別途値のチェックを行ってください
 //! BBB e;
 //! e.Import( 0 );
-//! // �t�@�C���ւ̏������݂ł͔O�̂���Export()���Ăяo���Ă�������
+//! // ファイルへの書き込みでは念のためExport()を呼び出してください
 //! int value = e.Export();
 //! @endcode
-//! @attention	�t�@�C���֏o�͂���ꍇ�͔O�̂���Export�֐��Œl���擾���Ă��������B
-//! @note		�X�}�[�genum�̓}�N����W�J���ăN���X�𐶐����܂��B
+//! @attention	ファイルへ出力する場合は念のためExport関数で値を取得してください。
+//! @note		スマートenumはマクロを展開してクラスを生成します。
 
 
-//! @brief		�X�}�[�genum��`�J�n
-//! @param		enumName	[in]	��`��
-//! @attention	�K��SmartEnumEnd�ƃZ�b�g�Ŏg�p���Ă��������B
-//! @note	�{�}�N����W�J���邱�ƂŒ�`���ŃN���X���쐬����܂��B
+//! @brief		スマートenum定義開始
+//! @param		enumName	[in]	定義名
+//! @attention	必ずSmartEnumEndとセットで使用してください。
+//! @note	本マクロを展開することで定義名でクラスが作成されます。
 #define SmartEnumBegin( enumName )							\
 class enumName												\
 {															\
 public:														\
 	enum _##enumName
 
-//! @brief		�X�}�[�genum��`�I��
-//! @param	enumName		[in]	SmartEnumBegin�Ŏw�肵����`��
-//! @param	defaultValue	[in]	�f�t�H���g�l
-//! @attention	enumName�͕K��SmartEnumBegin�Ŏw�肵����`�����g���Ă��������B
+//! @brief		スマートenum定義終了
+//! @param	enumName		[in]	SmartEnumBeginで指定した定義名
+//! @param	defaultValue	[in]	デフォルト値
+//! @attention	enumNameは必ずSmartEnumBeginで指定した定義名を使ってください。
 #define SmartEnumEnd( enumName, defaultValue )				\
 	;														\
 	enumName(void)											\
