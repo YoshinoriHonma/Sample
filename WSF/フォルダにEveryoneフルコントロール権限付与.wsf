@@ -1,0 +1,130 @@
+<?xml version="1.0" standalone="yes" encoding="utf-8" ?>
+<job id="main">
+	<script language="JavaScript">
+	<![CDATA[
+		var ExecAdminModeOption = "/runas";		//!< ExecAdminModeで管理者権限で実行し直したときに追加するオプション
+
+		var fs		= WScript.CreateObject("Scripting.FileSystemObject");
+		var shell	= new ActiveXObject("WScript.Shell");
+
+		// Adminモード
+		execAdminMode();
+		// コンソールモード
+		consoleMode( true );
+
+		WScript.StdOut.WriteLine( "" );
+		WScript.StdOut.WriteBlankLines( 1 );
+
+		var aryArgs = getArgs();
+		var max = aryArgs.length;
+		var isComplete = false;
+		for (var i = 0; i < max; i++) {
+			var target = aryArgs[i];
+			isComplete = false
+			WScript.StdOut.Write( formatProgress( i + 1, max ) + ":" + target + "..." );
+			// 所有権変更
+			if ( shell.Run( "takeown /f \"" + target + "\" /A /R", 1, true ) == 0 )
+			{
+				// アクセス許可付与
+				// アクセス権をフルコントロールにしてもUI上はアクセス許可が特殊になっているようだ
+				// http://pnpk.net/cms/archives/2220/all/1
+				isComplete = shell.Run( "icacls \"" + target + "\" /grant Everyone:(F) /T", 1, true ) == 0 ? true : false;
+			}
+			if ( isComplete )
+			{
+				WScript.StdOut.WriteLine( "OK" );
+			}
+			else
+			{
+				WScript.StdOut.WriteLine( "NG" );
+			}
+		}
+		WScript.StdOut.WriteBlankLines( 1 );
+		WScript.StdOut.WriteLine( "処理が完了しました。" );
+
+		aryArgs = null;
+		shell = null;
+		fs = null;
+
+
+		//! @brief		コンソールモード
+		//! @details	WSHにはマンドライン・モード(CScript)とGUIモード(WScript)があるが
+		//! <br>		コマンドラインモードでないと標準出力が使えない。
+		//! <br>		これを回避するために強制的にマンドライン・モードで起動させる。
+		//! @see		http://aquaware.opal.ne.jp/blog/?p=78
+		//! @param	isPause	[in]	pauseフラグ
+		//! 						@arg	true	終了時にpauseします
+		//! 						@arg	false	終了時にpauseしません
+		function consoleMode() {
+			var shell = new ActiveXObject("WScript.Shell");
+			if ( !( /CSCRIPT\.EXE/i ).test( WScript.FullName ) ) {
+				var strParam = "";
+				for (var i = 0; i < WScript.Arguments.Count(); i++){
+					strParam += " \"" + WScript.Arguments(i).replace("\"", "\"\"") + "\"";
+				}
+				WScript.Quit(shell.Run("cmd.exe /v:on /s /c \"cscript.exe //nologo \""
+					+ WScript.ScriptFullName + "\"" 
+					+ strParam + " & pause & exit /b !ERRORLEVEL!\"", 8, true));
+			}
+			shell = null;
+		}
+
+		//! @brief		管理者権限で実行
+		//! @details	WSHを管理者権限で実行するようにします。
+		//! <br>		管理者で実行するかの問合せが出ます。
+		//! @see		http://d.hatena.ne.jp/rowlock/20091010/1255194472
+		//! @note		元々の引数に/runasを追加します。
+		function execAdminMode() {
+			// runasのオプションが無い場合はrunasを付加して管理者モードで再実行
+			if ( !WScript.Arguments.Named.Exists( "runas" ) )
+			{
+				var strParam = "";
+				for (var i = 0; i < WScript.Arguments.Count(); i++){
+					strParam += " \"" + WScript.Arguments(i).replace("\"", "\"\"") + "\"";
+				}
+
+				var sh = WScript.CreateObject( "Shell.Application" )
+				sh.ShellExecute( "wscript.exe", "\"" + WScript.ScriptFullName + "\"" + strParam + " " + ExecAdminModeOption, "", "runas", 1 );
+				WScript.Quit( 0 );
+			}
+			// ある場合は何もしない
+		}
+
+		//! @brief		引数取得
+		//! @return		引数
+		//! @note		Arrayと微妙に異なるため、使いやすくするためArrayに詰め直す
+		//! @note		ExecAdminModeの無限ループ対応で埋め込んだオプションを除外して、本来のオプションのみを格納します。
+		function getArgs() {
+			var aryArgs = new Array();
+			var args = WScript.Arguments;
+			var index = 0;
+			for (var i = 0; i < args.length; i++)
+			{
+				if ( args(i) != ExecAdminModeOption )
+				{
+					aryArgs[index] = args(i);
+					index++;
+				}
+			}
+			return ( aryArgs );
+		}
+
+		//! @brief		進捗文字列整形
+		//! @details	進捗( n / m )を桁数を揃えた文字列として整形します。
+		//! @return		整形した文字列
+		//! @param	cur		[in]	現在の進捗
+		//! @param	max		[in]	最大値
+		function formatProgress( cur, max ) {
+			var txtMax = "" + max;
+			var txtCur = "" + cur;
+			while ( txtCur.length <= txtMax.length )
+			{
+				txtCur = " " + txtCur;
+			}
+			return ( txtCur + "/" + txtMax );
+		}
+
+
+	]]>
+	</script>
+</job>

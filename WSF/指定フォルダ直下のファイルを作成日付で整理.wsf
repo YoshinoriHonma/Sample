@@ -1,0 +1,86 @@
+<?xml version="1.0" standalone="yes" encoding="utf-8" ?>
+<job id="main">
+	<script language="JavaScript">
+	<![CDATA[
+		var fs = WScript.CreateObject("Scripting.FileSystemObject");
+
+		// コンソールモード
+		consoleMode();
+
+		WScript.StdOut.WriteLine( "指定フォルダ直下のファイルを作成日時で整理します。" );
+		WScript.StdOut.WriteLine( "サブフォルダは対象にしません。" );
+		WScript.StdOut.WriteBlankLines( 1 );
+
+		var aryArgs = WScript.Arguments;
+		var max = aryArgs.length;
+		for (var i = 0; i < max; i++) {
+			WScript.StdOut.Write( aryArgs(i) + "..." );
+			if ( arrangeFileByDate( fs, aryArgs(i) ) ) {
+				WScript.StdOut.WriteLine( "OK" );
+			} else {
+				WScript.StdOut.WriteLine( "NG" );
+			}
+		}
+		WScript.StdOut.WriteBlankLines( 1 );
+		WScript.StdOut.WriteLine( "処理が完了しました。" );
+
+		aryArgs = null;
+		fs = null;
+
+
+		function consoleMode() {
+			var shell = new ActiveXObject("WScript.Shell");
+			if ( !( /CSCRIPT\.EXE/i ).test( WScript.FullName ) ) {
+				var strParam = "";
+				for (var i = 0; i < WScript.Arguments.Count(); i++){
+					strParam += " \"" + WScript.Arguments(i).replace("\"", "\"\"") + "\"";
+				}
+				WScript.Quit(shell.Run("cmd.exe /v:on /s /c \"cscript.exe //nologo \""
+					+ WScript.ScriptFullName + "\"" 
+					+ strParam + " & pause & exit /b !ERRORLEVEL!\"", 8, true));
+			}
+			shell = null;
+		}
+
+		function arrangeFileByDate( fs, dirPath ) {
+			var ret = false;
+			if ( fs.FolderExists( dirPath ) ) {
+				var dir = fs.GetFolder( dirPath );
+				var em = new Enumerator( dir.Files );
+				var index = 0;
+				for ( em.moveFirst(); !em.atEnd(); em.moveNext() ) {
+					var date = new Date( em.item().DateCreated );
+					var month = "" + ( date.getMonth() + 1 );
+					if ( month.length < 2 ) {
+						month = "0" + month;
+					}
+					var destDirPath = dirPath + "/" + date.getFullYear() + "/" + month;
+					createMultiFolder( fs, destDirPath );
+
+					var destPath = destDirPath + "/" + em.item().Name;
+					em.item().Move( destPath );
+
+					date = null;
+				}
+				em = null;
+				dir = null;
+
+				ret = true;
+			}
+			return ret;
+		}
+
+
+		function createMultiFolder ( fs, path ) {
+ 			if ( !fs.FolderExists( path ) ) {
+				var parent = fs.GetParentFolderName( path );
+				if ( !fs.FolderExists( parent ) ) {
+					createMultiFolder( fs, parent );
+				}
+				fs.CreateFolder( path );
+			}
+		}
+
+	]]>
+	</script>
+</job>
