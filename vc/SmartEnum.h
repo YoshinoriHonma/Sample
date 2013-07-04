@@ -8,7 +8,7 @@
 //! // 型の定義
 //! SmartEnumBegin( ABC, OK )
 //! {
-//! 	OK,
+//! 	OK	= 0,
 //! 	NG
 //! } SmartEnumEnd;
 //!
@@ -74,4 +74,4 @@ public:														\
 
 
 //! @brief		スマートenum定義終了
-#define SmartEnumEnd	; };
+#define SmartEnumEnd	; }
