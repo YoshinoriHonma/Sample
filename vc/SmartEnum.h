@@ -1,4 +1,3 @@
-#pragma once
 //! @file
 //! @brief		スマートenum定義
 //! @details	enum定義を定義名::値という形でアクセスできるようにします。
@@ -7,11 +6,11 @@
 //! <br>		　ファイルから取得した値など、止むを得ず数値型の値を代入する場合はImport関数を使ってください
 //! @code
 //! // 型の定義
-//! SmartEnumBegin( ABC )
+//! SmartEnumBegin( ABC, OK )
 //! {
 //! 	OK,
 //! 	NG
-//! } SmartEnumEnd( ABC, OK );
+//! } SmartEnumEnd;
 //!
 //! 定義した型の利用
 //! ABC a = ABC::OK;
@@ -31,23 +30,17 @@
 //! @attention	ファイルへ出力する場合は念のためExport関数で値を取得してください。
 //! @note		スマートenumはマクロを展開してクラスを生成します。
 
-
 //! @brief		スマートenum定義開始
-//! @param		enumName	[in]	定義名
+//! @param		enumName		[in]	定義名
+//! @param		defaultValue	[in]	デフォルト値
 //! @attention	必ずSmartEnumEndとセットで使用してください。
 //! @note	本マクロを展開することで定義名でクラスが作成されます。
-#define SmartEnumBegin( enumName )							\
+#define SmartEnumBegin( enumName, defaultValue )			\
 class enumName												\
 {															\
 public:														\
-	enum _##enumName
-
-//! @brief		スマートenum定義終了
-//! @param	enumName		[in]	SmartEnumBeginで指定した定義名
-//! @param	defaultValue	[in]	デフォルト値
-//! @attention	enumNameは必ずSmartEnumBeginで指定した定義名を使ってください。
-#define SmartEnumEnd( enumName, defaultValue )				\
-	;														\
+	enum _##enumName;										\
+															\
 	enumName(void)											\
 	: value( enumName##::##defaultValue )					\
 	{}														\
@@ -76,5 +69,9 @@ public:														\
 	}														\
 private:													\
 	_##enumName value;										\
-}
+public:														\
+	enum _##enumName
 
+
+//! @brief		スマートenum定義終了
+#define SmartEnumEnd	; };
