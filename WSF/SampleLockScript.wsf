@@ -1,0 +1,110 @@
+<?xml version="1.0" standalone="yes" encoding="utf-8" ?>
+<job id="main">
+	<script language="JavaScript">
+	<![CDATA[
+		// 同時に実行されると困るスクリプトに対する対応案のサンプル
+		// 処理中にロックファイルを生成し、完了時に削除する
+		// ロックファイルが存在する場合は削除されるまで待機
+		// 起動順 ≠ 処理順になってしまうが、まとめて起動しておき、順次処理を行える
+		// 処理時間が長い処理等で有効とおもわれる。
+		// ロックファイル名はスクリプト単位でユニークになるよう、スクリプト名.lockとしています
+
+		var fs		= WScript.CreateObject("Scripting.FileSystemObject");
+		var lockFilePath	= "" + WScript.ScriptFullName + ".lock";
+
+		// コンソールモード
+		consoleMode();
+
+		// ロックによる待機かを判別するために、呼ばれたことだけ表示させてみる
+		WScript.StdOut.WriteLine( "Script Called" );
+
+		// test
+		WScript.StdOut.WriteLine( "Lock File Path：" + lockFilePath );
+
+		// 同じスクリプトが呼ばれた場合待機させるようにロックする
+		// ※ 既に同じスクリプトが呼び出されている場合は終了を待ちます
+		lockScript( lockFilePath, fs );
+
+		// ↓↓ 何かしらの処理
+		WScript.StdOut.Write( "Script Start..." );
+		WScript.Sleep( 5000 );
+		WScript.StdOut.WriteLine( "OK" );
+		// ↑↑ 何かしらの処理
+
+		// ロックを解除する
+		unlockScrip( lockFilePath, fs );
+
+		WScript.StdOut.WriteBlankLines( 1 );
+		WScript.StdOut.WriteLine( "処理が完了しました。" );
+
+		fs = null;
+
+
+		//! @brief		コンソールモード
+		//! @details	WSHにはマンドライン・モード(CScript)とGUIモード(WScript)があるが
+		//! <br>		コマンドラインモードでないと標準出力が使えない。
+		//! <br>		これを回避するために強制的にマンドライン・モードで起動させる。
+		//! @see		http://aquaware.opal.ne.jp/blog/?p=78
+		function consoleMode() {
+			var shell = new ActiveXObject("WScript.Shell");
+			if ( !( /CSCRIPT\.EXE/i ).test( WScript.FullName ) ) {
+				var strParam = "";
+				for (var i = 0; i < WScript.Arguments.Count(); i++){
+					strParam += " \"" + WScript.Arguments(i).replace("\"", "\"\"") + "\"";
+				}
+				WScript.Quit(shell.Run("cmd.exe /v:on /s /c \"cscript.exe //nologo \""
+					+ WScript.ScriptFullName + "\"" 
+					+ strParam + " & pause & exit /b !ERRORLEVEL!\"", 8, true));
+			}
+			shell = null;
+		}
+
+		//! @brief		スクリプトロック
+		//! @details	同時に起動されると不都合があるスクリプトに対して、処理終了まで待機させるためのロックファイルを作成します。
+		//! @note		既にそのスクリプトが起動していた場合はunlockScriptが呼ばれるまで待機します。
+		//! @note		同時に処理を行うことは抑止しますが、監視間隔の都合上、処理順は保証しません。
+		//! @attention	必ずunlockScriptでロックを解除してください。
+		//! @param	lockFilePath		[in]	パス
+		function lockScript( lockFilePath, fs ) {
+			var isShowMessage = false;
+			if ( fs.FileExists( lockFilePath ) )
+			{
+				isShowMessage = true;
+			}
+			if ( isShowMessage )
+			{
+				// メッセージを出力
+				WScript.StdOut.WriteLine( WScript.ScriptName + "が既に起動しているため、終了まで待機します..." );
+			}
+			while( fs.FileExists( lockFilePath ) )
+			{
+				// 一定時間待機
+				WScript.Sleep( 100 );
+			}
+			// ロックファイルを作成
+			fs.CreateTextFile( lockFilePath );
+
+			if ( isShowMessage )
+			{
+				// メッセージを出力
+				WScript.StdOut.WriteLine( "処理を開始します。" );
+			}
+		}
+
+		//! @brief		スクリプトロック解除
+		//! @details	同時に起動されると不都合があるスクリプトに対して、処理終了まで待機させるためのロックファイルを削除します。
+		//! @param	lockFilePath		[in]	パス
+		function unlockScrip( lockFilePath, fs ) {
+			if ( fs.FileExists( lockFilePath ) )
+			{
+				fs.DeleteFile( lockFilePath );
+			}
+		}
+
+
+
+
+
+	]]>
+	</script>
+</job>
