@@ -1,32 +1,32 @@
 #pragma once
 
-//! @brief		ã‚½ãƒ¼ãƒˆå¯èƒ½Array
-//! @details	CArrayã«ã‚½ãƒ¼ãƒˆæ©Ÿèƒ½ã‚’è¿½åŠ ã—ãŸã‚¯ãƒ©ã‚¹ã§ã™ã€‚
-//! @note		ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§ã¯operatorã«ã‚ˆã‚‹ã‚½ãƒ¼ãƒˆã‚’å®šç¾©ã—ã¦ã„ã¾ã™ãŒã€
-//! <br>		ã‚³ãƒ¼ãƒ«ãƒãƒƒã‚¯é–¢æ•°ã‚’å®šç¾©ã™ã‚‹ã“ã¨ã«ã‚ˆã£ã¦ã€ã‚½ãƒ¼ãƒˆã‚’ã‚«ã‚¹ã‚¿ãƒã‚¤ã‚ºã§ãã¾ã™ã€‚
+//! @brief		ƒ\[ƒg‰Â”\Array
+//! @details	CArray‚Éƒ\[ƒg‹@”\‚ğ’Ç‰Á‚µ‚½ƒNƒ‰ƒX‚Å‚·B
+//! @note		ƒfƒtƒHƒ‹ƒg‚Å‚Íoperator‚É‚æ‚éƒ\[ƒg‚ğ’è‹`‚µ‚Ä‚¢‚Ü‚·‚ªA
+//! <br>		ƒR[ƒ‹ƒoƒbƒNŠÖ”‚ğ’è‹`‚·‚é‚±‚Æ‚É‚æ‚Á‚ÄAƒ\[ƒg‚ğƒJƒXƒ^ƒ}ƒCƒY‚Å‚«‚Ü‚·B
 template<class Type, class ArgType = const Type&>
 class SortArray
 	: public CArray<Type, ArgType&>
 {
 public:
 
-	//! @brief		æ¯”è¼ƒé–¢æ•°å‹
-	//! @details	æ¯”è¼ƒé–¢æ•°ã®ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—
-	//! @retval		è² 	aã¯bã‚ˆã‚Šå°ã•ã„
-	//! @retval		 0	aã¨bã¯ç­‰ã—ã„
-	//! @retval		æ­£	aã¯bã‚ˆã‚Šå¤§ãã„
-	//! @param		pA	[in]	æ¯”è¼ƒè¦ç´ A
-	//! @param		pB	[in]	æ¯”è¼ƒè¦ç´ B
+	//! @brief		”äŠrŠÖ”Œ^
+	//! @details	”äŠrŠÖ”‚Ìƒvƒƒgƒ^ƒCƒv
+	//! @retval		•‰	a‚Íb‚æ‚è¬‚³‚¢
+	//! @retval		 0	a‚Æb‚Í“™‚µ‚¢
+	//! @retval		³	a‚Íb‚æ‚è‘å‚«‚¢
+	//! @param		pA	[in]	”äŠr—v‘fA
+	//! @param		pB	[in]	”äŠr—v‘fB
 	typedef int (__cdecl * CompareFunction)(const void * pA, const void * pB) throw();
 
-	//! @brief		operatorã«ã‚ˆã‚‹æ¯”è¼ƒ
-	//! @details	operatorã«ã‚ˆã‚‹æ¯”è¼ƒã‚’å®šç¾©ã—ã¾ã™ã€‚
-	//! @attention	æœ¬é–¢æ•°ã‚’ä½¿ç”¨ã™ã‚‹å ´åˆã€Typeã«ã¯operator ==ã¨operator >ãŒå®šç¾©ã•ã‚Œã¦ã„ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
-	//! @retval		è² 	aã¯bã‚ˆã‚Šå°ã•ã„
-	//! @retval		 0	aã¨bã¯ç­‰ã—ã„
-	//! @retval		æ­£	aã¯bã‚ˆã‚Šå¤§ãã„
-	//! @param		pA	[in]	æ¯”è¼ƒè¦ç´ A
-	//! @param		pB	[in]	æ¯”è¼ƒè¦ç´ B
+	//! @brief		operator‚É‚æ‚é”äŠr
+	//! @details	operator‚É‚æ‚é”äŠr‚ğ’è‹`‚µ‚Ü‚·B
+	//! @attention	–{ŠÖ”‚ğg—p‚·‚éê‡AType‚É‚Íoperator ==‚Æoperator >‚ª’è‹`‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
+	//! @retval		•‰	a‚Íb‚æ‚è¬‚³‚¢
+	//! @retval		 0	a‚Æb‚Í“™‚µ‚¢
+	//! @retval		³	a‚Íb‚æ‚è‘å‚«‚¢
+	//! @param		pA	[in]	”äŠr—v‘fA
+	//! @param		pB	[in]	”äŠr—v‘fB
 	static int CompareByOperator( Type* pA, Type* pB ) throw()
 	{
 		int ret = -1;
@@ -41,23 +41,23 @@ public:
 		return ret;
 	};
 
-	//! @brief	ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	//! @brief	ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 	SortArray(void) throw()
 		: CArray<Type, Type&>()
 	{}
 
-	//! @brief	ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	//! @brief	ƒfƒXƒgƒ‰ƒNƒ^
 	virtual ~SortArray(void) throw()
 	{}
 
-	//! @brief		ã‚½ãƒ¼ãƒˆ
-	//! @details	è¦ç´ ã‚’ã‚½ãƒ¼ãƒˆã—ã¾ã™ã€‚
-	//! @attention	æ¯”è¼ƒç”¨é–¢æ•°ã¯ä½¿ã†å´ã§ç”¨æ„ã—ã¦ãã ã•ã„ã€‚
-	//! @note		è¦ç´ ãŒãƒã‚¤ãƒ³ã‚¿ã®å ´åˆã€é€šå¸¸ã®æ–¹æ³•ã§ã¯ã‚½ãƒ¼ãƒˆãŒã§ããªã„ãŸã‚ã€
-	//! @br			æ¯”è¼ƒé–¢æ•°ã®å¼•æ•°ã¯è¦ç´ å‹ã®ãƒã‚¤ãƒ³ã‚¿ã«ã—ãŸã‚‚ã®ã‚’ç”¨æ„ã—ã¦ã€CompareFunctionã«ã‚­ãƒ£ã‚¹ãƒˆã—ã¦ãã ã•ã„ã€‚
-	// !@param		compareFunction	[in]	æ¯”è¼ƒé–¢æ•°
+	//! @brief		ƒ\[ƒg
+	//! @details	—v‘f‚ğƒ\[ƒg‚µ‚Ü‚·B
+	//! @attention	”äŠr—pŠÖ”‚Íg‚¤‘¤‚Å—pˆÓ‚µ‚Ä‚­‚¾‚³‚¢B
+	//! @note		—v‘f‚ªƒ|ƒCƒ“ƒ^‚Ìê‡A’Êí‚Ì•û–@‚Å‚Íƒ\[ƒg‚ª‚Å‚«‚È‚¢‚½‚ßA
+	//! @br			”äŠrŠÖ”‚Ìˆø”‚Í—v‘fŒ^‚Ìƒ|ƒCƒ“ƒ^‚É‚µ‚½‚à‚Ì‚ğ—pˆÓ‚µ‚ÄACompareFunction‚ÉƒLƒƒƒXƒg‚µ‚Ä‚­‚¾‚³‚¢B
+	// !@param		compareFunction	[in]	”äŠrŠÖ”
 	//! @code
-	//! // æ¯”è¼ƒé–¢æ•°
+	//! // ”äŠrŠÖ”
 	//! int Compare( int** ppA, int** ppB )
 	//! {
 	//! 	return *(*ppA) - *(*ppB);
@@ -84,9 +84,9 @@ public:
 					sizeof( Type ), compareFunction );
 	};
 
-	//! @brief		operatorã«ã‚ˆã‚‹ã‚½ãƒ¼ãƒˆ
-	//! @details	operatorã«ã‚ˆã‚‹æ¯”è¼ƒã§ã‚½ãƒ¼ãƒˆã‚’è¡Œã„ã¾ã™
-	//! @attention	æœ¬é–¢æ•°ã‚’ä½¿ç”¨ã™ã‚‹å ´åˆã€Typeã«ã¯operator ==ã¨operator >ãŒå®šç¾©ã•ã‚Œã¦ã„ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
+	//! @brief		operator‚É‚æ‚éƒ\[ƒg
+	//! @details	operator‚É‚æ‚é”äŠr‚Åƒ\[ƒg‚ğs‚¢‚Ü‚·
+	//! @attention	–{ŠÖ”‚ğg—p‚·‚éê‡AType‚É‚Íoperator ==‚Æoperator >‚ª’è‹`‚³‚ê‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·B
 	void SortByOperator() throw()
 	{
 		Sort( reinterpret_cast<CompareFunction>( &CompareByOperator ) );
