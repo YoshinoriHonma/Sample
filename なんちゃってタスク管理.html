@@ -1,0 +1,131 @@
+<!DOCTYPE html> 
+<html lang="ja"> 
+<head> 
+<meta charset=shift-jis>
+<title>なんちゃってタスク管理</title>
+
+<!--
+
+http://libro.tuyano.com/index3?id=377001&page=4
+-->
+
+
+<style>
+
+.todo {
+  /*単なるスタイリング*/
+  width:100%; height:100%; margin:20px; background-color:#ffffff; border:1px solid #000000;
+  /*以下はwebkit系ブラウザでドラッグ＆ドロップを動かすための指定（ブラウザのサポートが進めば、必要なくなると思われます）*/
+  -khtml-user-drag: element;
+}
+.doing {
+  /*単なるスタイリング*/
+  width:100%; height:100%; margin:20px; background-color:#ffffff; border:1px solid #000000;
+  /*以下はwebkit系ブラウザでドラッグ＆ドロップを動かすための指定（ブラウザのサポートが進めば、必要なくなると思われます）*/
+  -khtml-user-drag: element;
+}
+.done {
+  /*単なるスタイリング*/
+  width:100%; height:100%; margin:20px; background-color:#ffffff; border:1px solid #000000;
+  /*以下はwebkit系ブラウザでドラッグ＆ドロップを動かすための指定（ブラウザのサポートが進めば、必要なくなると思われます）*/
+  -khtml-user-drag: element;
+}
+
+
+.task[status="todo"] {
+	width:90%; height:40px;
+	margin:5px; background-color:#fffacd; border:1px solid #000000;
+}
+.task[status="doing"] {
+	width:90%; height:40px;
+	margin:5px; background-color:#fffacd; border:1px solid #000000;
+}
+
+.task[status="done"] {
+	width:90%; height:40px;
+	margin:5px; background-color:#a0a0a0; border:1px solid #000000;
+}
+
+
+</style>
+
+<script>
+/***** ドラッグ開始時の処理 *****/
+function f_dragstart(event){
+  //ドラッグするデータのid名をDataTransferオブジェクトにセット
+  event.dataTransfer.setData("text", event.target.id);
+}
+
+/***** ドラッグ要素がドロップ要素に重なっている間の処理 *****/
+function f_dragover(event){
+  //dragoverイベントをキャンセルして、ドロップ先の要素がドロップを受け付けるようにする
+  event.preventDefault();
+}
+
+/***** ドロップ時の処理 *****/
+function f_drop_todo(event){
+  //ドラッグされたデータのid名をDataTransferオブジェクトから取得
+  var id_name = event.dataTransfer.getData("text");
+  //id名からドラッグされた要素を取得
+  var drag_elm =document.getElementById(id_name);
+  drag_elm.style.backgroundColor = "#fffacd";
+  //ドロップ先にドラッグされた要素を追加
+  event.currentTarget.appendChild(drag_elm);
+  //エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
+  event.preventDefault();
+}
+function f_drop_doing(event){
+  //ドラッグされたデータのid名をDataTransferオブジェクトから取得
+  var id_name = event.dataTransfer.getData("text");
+  //id名からドラッグされた要素を取得
+  var drag_elm =document.getElementById(id_name);
+  drag_elm.style.backgroundColor = "#fffacd";
+  //ドロップ先にドラッグされた要素を追加
+  event.currentTarget.appendChild(drag_elm);
+  //エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
+  event.preventDefault();
+}
+function f_drop_done(event){
+  //ドラッグされたデータのid名をDataTransferオブジェクトから取得
+  var id_name = event.dataTransfer.getData("text");
+  //id名からドラッグされた要素を取得
+  var drag_elm =document.getElementById(id_name);
+  drag_elm.style.backgroundColor = "#a0a0a0";
+  //ドロップ先にドラッグされた要素を追加
+  event.currentTarget.appendChild(drag_elm);
+  //エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
+  event.preventDefault();
+}
+
+</script>
+</head>
+<body>
+
+<table>
+	<tr>
+		<th width=120>todo</th>
+		<th width=120>doing</th>
+		<th width=120>done</th>
+	</tr>
+	<tr>
+		<td height=500>
+			<div class="todo" id="todo" ondragover="f_dragover(event)" ondrop="f_drop_todo(event)">
+				<div id="task-01" class="task" draggable="true" ondragstart="f_dragstart(event)" status="todo">タスク1</div>
+				<div id="task-02" class="task" draggable="true" ondragstart="f_dragstart(event)" status="todo">タスク2</div>
+				<div id="task-03" class="task" draggable="true" ondragstart="f_dragstart(event)" status="todo">タスク3</div>
+			</div>
+		</td>
+		<td height=500>
+			<div class="doing" id="doing" ondragover="f_dragover(event)" ondrop="f_drop_doing(event)">
+			</div>
+		</td>
+		<td height=500>
+			<div class="done" id="done" ondragover="f_dragover(event)" ondrop="f_drop_done(event)">
+				<div id="task-04" class="task" draggable="true" ondragstart="f_dragstart(event)" status="done">タスク4</div>
+			</div>
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>
