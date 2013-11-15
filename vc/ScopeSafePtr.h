@@ -1,31 +1,61 @@
 #pragma once
 
-// スコープから外れると自動的にメモリを解放します
+
+// ScopeSafePtr
 //
-// 配列はScopePtr<～[]>と宣言すること
-// 例
-// ScopePtr<int[]> p = new int [ 4 ];
+// If it separates from ScopeSafePtr from a scope, it will release a memory automatically. 
+// Since the same access as a pointer can be performed, the replacement from the existing code is easy. 
+//
+/* Sample Code
+void Sample()
+{
+	// Single
+	{
+		ScopeSafePtr<int>	p	= new int;
+		*p = 10;
+		int value = *p;
+	}
 
+	// Array
+	{
+		ScopeSafePtr<int[]> pArray = new int [ 4 ];
+		for ( size_t i = 0; i < 4; i++ )
+		{
+			pArray[i] = static_cast<int>( i );
+		}
+	}
+}
 
-template<class T>
+BYTE* SampleFileRead( const char* filePath, size_t buffSize )
+{
+	ScopeSafePtr<BYTE[]> pBuff = new BYTE[ buffSize ];			// create buffer
+	FILE* pFile = fopen( filePath, "rb" );
+	if ( pFile == NULL ) return NULL;							// auto delete
+	if ( fread( pBuff, buffSize, 1, pFile ) < 1 ) return NULL;	// auto delete
+	fclose( pFile );
+	return pBuff.Release();	// return buffer
+}
+
+*/
+template<class Type>
 class ScopeSafePtr
 {
-	T*	p;
+	Type*	p;
 
-	// 使用禁止
-	// コピーコンストラクタの禁止
-	ScopeSafePtr( const ScopeSafePtr<T>& src )
+	// Don't use.
+	ScopeSafePtr( const ScopeSafePtr<Type>& src )
 	{
-		*this - src;
+		*this = src;
 	}
-	// ScopePtr同士の代入の禁止
-	ScopeSafePtr<T>& operator = ( const ScopeSafePtr<T>& src )
+	// Don't use.
+	ScopeSafePtr<Type>& operator = ( const ScopeSafePtr<Type>& src )
 	{
-		ASSERT( FALSE );
+		ASSERT( FALSE );	// Don't use.
 		return *this;
 	}
+
 public:
-	ScopeSafePtr( T* p = NULL )
+	ScopeSafePtr( Type* p = NULL )
 	{
 		this->p = p;
 	}
@@ -34,7 +64,7 @@ public:
 		Delete();
 	}
 
-	bool IsNull(void)
+	bool IsNull(void) const
 	{
 		reutrn this->p == NULL ? true : false;
 	}
@@ -46,82 +76,77 @@ public:
 			this->p = NULL;
 		}
 	}
-	// 所有権の放棄
-	// 内部では解放をしない
-	T* Release(void)
+	// Abandonment of ownership
+	// Don't delete.
+	Type* Release(void)
 	{
-		T* p = this->p;
+		Type* p = this->p;
 		this->p = NULL;
 		return p;
 	}
-
-	// 代入
-	// 今まで保持していた情報は破棄します
-	T* operator = ( T* p )
+	Type* operator = ( Type* p )
 	{
 		Delete();
 		this->p = p;
 		return p;
 	}
 
-	// アクセス関連
-	T* GetPtr(void)
+	// accesser
+	Type* GetPtr(void)
 	{
 		return this->p;
 	}
-	const T* GetPtr(void) const
+	const Type* GetPtr(void) const
 	{
 		return this->p;
 	}
-	// キャスト
-	operator T*(void)
+	operator Type*(void)
 	{
 		return this->p;
 	}
-	// キャスト
-	operator const T*(void) const
+	operator const Type*(void) const
 	{
 		return this->p;
 	}
-	// 実体へのアクセス
-	T& operator *(void)
-	{
-		return *this->p;
-	}
-	// ポインタのアドレスの取得
-	T** operator &(void)
+	Type** operator &(void)
 	{
 		return &this->p;
 	}
-	// メンバへのアクセス
-	T* operator -> (void)
+	const Type** operator &(void) const
+	{
+		return &this->p;
+	}
+	Type& operator *(void)
+	{
+		return *this->p;
+	}
+	Type* operator -> (void)
 	{
 		return this->p;
 	}
 
 };
 
-// 配列用
-template<class T>
-class ScopeSafePtr<T[]>
+template<class Type>
+class ScopeSafePtr<Type[]>
 {
-	T*	p;
+	Type*	p;
 
-	// 使用禁止
-	// コピーコンストラクタの禁止
-	ScopeSafePtr( const ScopeSafePtr<T[]>& src )
+	// Don't use.
+	ScopeSafePtr( const ScopeSafePtr<Type[]>& src )
 	{
-		*this - src;
+		*this = src;
 	}
-	// ScopePtr同士の代入の禁止
-	ScopeSafePtr<T[]>& operator = ( const ScopeSafePtr<T[]>& src )
+	// Don't use.
+	ScopeSafePtr<Type[]>& operator = ( const ScopeSafePtr<Type[]>& src )
 	{
-		ASSERT( FALSE );
+		ASSERT( FALSE );	// Don't use.
 		return *this;
 	}
+
 public:
 
-	ScopeSafePtr( T* p = NULL )
+	ScopeSafePtr( Type* p = NULL )
 	{
 		this->p = p;
 	}
@@ -130,11 +155,10 @@ public:
 		Delete();
 	}
 
-	bool IsNull(void)
+	bool IsNull(void) const
 	{
 		reutrn this->p == NULL ? true : false;
 	}
-	// delete
 	void Delete(void)
 	{
 		if ( this->p != NULL )
@@ -143,43 +167,54 @@ public:
 			this->p = NULL;
 		}
 	}
-	// 所有権の放棄
-	// 内部では解放をしない
-	T* Release(void)
+	// Abandonment of ownership
+	// Don't delete.
+	Type* Release(void)
 	{
-		T* p = this->p;
+		Type* p = this->p;
 		this->p = NULL;
 		return p;
 	}
-
-	// 代入
-	// 今まで保持していた情報は破棄します
-	T* operator = ( T* p )
+	Type* operator = ( Type* p )
 	{
 		Delete();
 		this->p = p;
 		return p;
 	}
 
-	// アクセス関連
-	T* GetPtr(void)
+	// accesser
+	Type* GetPtr(void)
 	{
 		return this->p;
 	}
-	const T* GetPtr(void) const
+	const Type* GetPtr(void) const
 	{
 		return this->p;
 	}
-
-	// 配列アクセス
-	T* operator []( size_t i )
+	operator Type*(void)
 	{
-		return this->p + i;
+		return this->p;
 	}
-	// 配列アクセス
-	const T* operator []( size_t i ) const
+	operator const Type*(void) const
 	{
-		return this->p + i;
+		return this->p;
+	}
+	Type** operator &(void)
+	{
+		return &this->p;
+	}
+	const Type** operator &(void) const
+	{
+		return &this->p;
+	}
+	
+	Type& operator []( size_t index )
+	{
+		return *( this->p + index );
+	}
+	const Type& operator []( size_t index ) const
+	{
+		return *( this->p + index );
 	}
 
 };
