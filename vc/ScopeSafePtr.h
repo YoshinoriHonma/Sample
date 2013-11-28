@@ -53,7 +53,22 @@ class ScopeSafePtr
 		ASSERT( FALSE );	// Don't use.
 		return *this;
 	}
-
+	// Don't use.
+#if _DEBUG
+	static void* operator new( size_t, void*, long a ){ return NULL; }
+	static void* operator new[]( size_t, void*, long a ){ return NULL; }
+#else
+	static void* operator new( size_t){ return NULL; }
+	static void* operator new[]( size_t){ return NULL; }
+#endif
+	// Don't use.
+	static void operator delete(void*pv){}
+	// Don't use.
+	static void operator delete[](void*pv){}
+	// Don't use.
+	Type& operator []( size_t index ) { return *this->p; }
+	// Don't use.
+	const Type& operator []( size_t index ) const{ return *this->p; }
 public:
 	ScopeSafePtr( Type* p = NULL )
 	{
@@ -143,7 +158,18 @@ class ScopeSafePtr<Type[]>
 		ASSERT( FALSE );	// Don't use.
 		return *this;
 	}
-
+	// Don't use.
+#if _DEBUG
+	static void* operator new( size_t, void*, long a ){ return NULL; }
+	static void* operator new[]( size_t, void*, long a ){ return NULL; }
+#else
+	static void* operator new( size_t){ return NULL; }
+	static void* operator new[]( size_t){ return NULL; }
+#endif
+	// Don't use.
+	static void operator delete(void*pv){}
+	// Don't use.
+	static void operator delete[](void*pv){}
 public:
 
 	ScopeSafePtr( Type* p = NULL )
