@@ -54,21 +54,27 @@ class ScopeSafePtr
 		return *this;
 	}
 	// Don't use.
-#if _DEBUG
-	static void* operator new( size_t, void*, long a ){ return NULL; }
-	static void* operator new[]( size_t, void*, long a ){ return NULL; }
-#else
 	static void* operator new( size_t){ return NULL; }
+	// Don't use.
 	static void* operator new[]( size_t){ return NULL; }
+	// Don't use.
+	static void operator delete(void*){}
+	// Don't use.
+	static void operator delete[](void*){}
+	// Don't use.
+	Type& operator []( size_t index ) { return *( this->p + index ); }
+	// Don't use.
+	const Type& operator []( size_t index ) const{ return *( this->p + index ); }
+#ifdef DEBUG_NEW
+	// Don't use.
+	static void* operator new( size_t, LPCSTR, int ){ return NULL; }
+	// Don't use.
+	static void* operator new[]( size_t, LPCSTR, int ){ return NULL; }
+	// Don't use.
+	static void operator delete(void*, LPCSTR, int ) {}
+	// Don't use.
+	static void operator delete[](void*, LPCSTR, int ) {}
 #endif
-	// Don't use.
-	static void operator delete(void*pv){}
-	// Don't use.
-	static void operator delete[](void*pv){}
-	// Don't use.
-	Type& operator []( size_t index ) { return *this->p; }
-	// Don't use.
-	const Type& operator []( size_t index ) const{ return *this->p; }
 public:
 	ScopeSafePtr( Type* p = NULL )
 	{
@@ -88,8 +94,8 @@ public:
 		if ( this->p != NULL )
 		{
 			delete this->p;
-			this->p = NULL;
 		}
+		this->p = NULL;
 	}
 	// Abandonment of ownership
 	// Don't delete.
@@ -99,6 +105,7 @@ public:
 		this->p = NULL;
 		return p;
 	}
+	// Delete old pointer
 	Type* operator = ( Type* p )
 	{
 		Delete();
@@ -159,17 +166,23 @@ class ScopeSafePtr<Type[]>
 		return *this;
 	}
 	// Don't use.
-#if _DEBUG
-	static void* operator new( size_t, void*, long a ){ return NULL; }
-	static void* operator new[]( size_t, void*, long a ){ return NULL; }
-#else
 	static void* operator new( size_t){ return NULL; }
+	// Don't use.
 	static void* operator new[]( size_t){ return NULL; }
+	// Don't use.
+	static void operator delete(void*){}
+	// Don't use.
+	static void operator delete[](void*){}
+#ifdef DEBUG_NEW
+	// Don't use.
+	static void* operator new( size_t, LPCSTR*, int ){ return NULL; }
+	// Don't use.
+	static void* operator new[]( size_t, LPCSTR*, int ){ return NULL; }
+	// Don't use.
+	static void operator delete(void*, LPCSTR, int ) {}
+	// Don't use.
+	static void operator delete[](void*, LPCSTR, int ) {}
 #endif
-	// Don't use.
-	static void operator delete(void*pv){}
-	// Don't use.
-	static void operator delete[](void*pv){}
 public:
 
 	ScopeSafePtr( Type* p = NULL )
@@ -180,7 +193,6 @@ public:
 	{
 		Delete();
 	}
-
 	bool IsNull(void) const
 	{
 		reutrn this->p == NULL ? true : false;
@@ -190,8 +202,8 @@ public:
 		if ( this->p != NULL )
 		{
 			delete [] this->p;
-			this->p = NULL;
 		}
+		this->p = NULL;
 	}
 	// Abandonment of ownership
 	// Don't delete.
@@ -201,6 +213,7 @@ public:
 		this->p = NULL;
 		return p;
 	}
+	// Delete old pointer
 	Type* operator = ( Type* p )
 	{
 		Delete();
@@ -245,3 +258,24 @@ public:
 
 };
 
+
+// Don't use.
+template<class Type>
+class ScopeSafePtr<Type*>
+{
+	// Don't use.
+	ScopeSafePtr(void) {}
+	// Don't use.
+	~ScopeSafePtr(void) {}
+	// Don't use.
+	ScopeSafePtr( const ScopeSafePtr<Type*>& src )
+	{
+		*this = src;
+	}
+	// Don't use.
+	ScopeSafePtr<Type*>& operator = ( const ScopeSafePtr<Type*>& src )
+	{
+		ASSERT( FALSE );	// Don't use.
+		return *this;
+	}
+};
